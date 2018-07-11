@@ -7,10 +7,10 @@ import skimage.io
 import matplotlib
 import matplotlib.pyplot as plt
 
-import coco
-import utils
-import model as modellib
-import visualize
+import proposal_gen.coco as coco
+import proposal_gen.utils as utils
+import proposal_gen.model as modellib
+import proposal_gen.visualize as visualize
 
 import torch
 
@@ -20,6 +20,8 @@ ROOT_DIR = os.getcwd()
 
 # Directory to save logs and trained model
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
+# Directory to save results
+RESULT_DIR = os.path.join(ROOT_DIR, "results")
 
 # Path to trained weights file
 # Download this file and place in the root of your
@@ -68,13 +70,18 @@ class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
 
 # Load a random image from the images folder
 file_names = next(os.walk(IMAGE_DIR))[2]
-image = skimage.io.imread(os.path.join(IMAGE_DIR, random.choice(file_names)))
+file_name = random.choice(file_names)
+image = skimage.io.imread(os.path.join(IMAGE_DIR, file_name))
 
 # Run detection
 results = model.detect([image])
 
 # Visualize results
 r = results[0]
-visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
+ax = visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
                             class_names, r['scores'])
 plt.show()
+# save img
+fig = ax.get_figure()
+fig.savefig(os.path.join(RESULT_DIR, file_name+'.png'))
+ax.close()
