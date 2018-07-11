@@ -20,7 +20,7 @@ import matplotlib.patches as patches
 import matplotlib.lines as lines
 from matplotlib.patches import Polygon
 
-import .utils as utils
+from . import utils
 
 
 ############################################################

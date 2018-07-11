@@ -7,7 +7,7 @@ import skimage.io
 import matplotlib
 import matplotlib.pyplot as plt
 
-import proposal_gen.coco as coco
+import coco
 import proposal_gen.utils as utils
 import proposal_gen.model as modellib
 import proposal_gen.visualize as visualize
