@@ -55,11 +55,11 @@ import torch
 ROOT_DIR = os.getcwd()
 
 # Path to trained weights file
-COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.pth")
+COCO_MODEL_PATH = os.path.join(ROOT_DIR, "logs", "proposal_gen", "mask_rcnn_coco.pth")
 
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
-DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
+DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs", "proposal_gen")
 DEFAULT_DATASET_YEAR = "2014"
 
 ############################################################
