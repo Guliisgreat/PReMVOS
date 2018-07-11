@@ -25,6 +25,7 @@ from . import utils
 from . import visualize
 from .nms.nms_wrapper import nms
 from .roialign.roi_align.crop_and_resize import CropAndResizeFunction
+from .augment import random_flip, random_crop, random_right_angle_rotate, random_brightness_transform
 
 
 ############################################################
@@ -1136,6 +1137,14 @@ def compute_losses(rpn_match, rpn_bbox, rpn_class_logits, rpn_pred_bbox, target_
 #  Data Generator
 ############################################################
 
+def image_augment(image, mask):
+    image, mask = random_flip(image, mask)
+    image, mask = random_crop(image, mask)
+    image, mask = random_right_angle_rotate(image, mask)
+    image = random_brightness_transform(image)
+    return image, mask
+
+
 def load_image_gt(dataset, config, image_id, augment=False,
                   use_mini_mask=False):
     """Load and return ground truth data for an image (image, mask, bounding boxes).
@@ -1160,6 +1169,9 @@ def load_image_gt(dataset, config, image_id, augment=False,
     # Load image and mask
     image = dataset.load_image(image_id)
     mask, class_ids = dataset.load_mask(image_id)
+    # Image augmentation
+    if augment and random.randint(0, 1):
+        image, mask = image_augment(image, mask)
     shape = image.shape
     image, window, scale, padding = utils.resize_image(
         image,
@@ -1169,10 +1181,10 @@ def load_image_gt(dataset, config, image_id, augment=False,
     mask = utils.resize_mask(mask, scale, padding)
 
     # Random horizontal flips.
-    if augment:
-        if random.randint(0, 1):
-            image = np.fliplr(image)
-            mask = np.fliplr(mask)
+    #if augment:
+    #    if random.randint(0, 1):
+    #        image = np.fliplr(image)
+    #        mask = np.fliplr(mask)
 
     # Bounding boxes. Note that some boxes might be all zeros
     # if the corresponding mask got cropped out.
@@ -1552,7 +1564,7 @@ class MaskRCNN(nn.Module):
         checkpoint = os.path.join(dir_name, checkpoints[-1])
         return dir_name, checkpoint
 
-    def load_weights(self, filepath):
+    def load_weights(self, filepath, callback=None):
         """Modified version of the correspoding Keras function with
         the addition of multi-GPU support and the ability to exclude
         some layers from loading.
@@ -1560,6 +1572,8 @@ class MaskRCNN(nn.Module):
         """
         if os.path.exists(filepath):
             state_dict = torch.load(filepath)
+            if callback:
+                state_dict = callback(state_dict)
             self.load_state_dict(state_dict, strict=False)
         else:
             print("Weight file not found ...")

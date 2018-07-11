@@ -457,6 +457,13 @@ def generate_pyramid_anchors(scales, ratios, feature_shapes, feature_strides,
 
 
 
-
+def state_modifier(state_dict):
+    state_dict.pop("mask.conv5.bias")
+    state_dict.pop("mask.conv5.weight")
+    state_dict.pop("classifier.linear_class.bias")
+    state_dict.pop("classifier.linear_class.weight")
+    state_dict.pop("classifier.linear_bbox.bias")
+    state_dict.pop("classifier.linear_bbox.weight")
+    return state_dict
 
 
