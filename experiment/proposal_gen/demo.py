@@ -84,4 +84,4 @@ plt.show()
 # save img
 fig = ax.get_figure()
 fig.savefig(os.path.join(RESULT_DIR, file_name+'.png'))
-ax.close()
+#plt.close()
