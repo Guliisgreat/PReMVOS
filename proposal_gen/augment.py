@@ -13,7 +13,7 @@ def random_flip(image, masks):
     return image, masks
 
 
-def random_crop(image, masks, coe=0.7):
+def random_crop(image, masks, class_ids, coe=0.7):
     h, w = image.shape[:2]
     nh, nw = ( int(h * coe), int(w * coe) )
     random_x = random.choice(  range( 0, w - nw )   )
@@ -22,6 +22,7 @@ def random_crop(image, masks, coe=0.7):
     ret_image = image[random_y:(random_y+nh), random_x:(random_x+nw), :]
 
     ret_masks = []
+    drop_index = []
     for i in range(masks.shape[2]):
         mask = masks[:,:,i]
         mask = mask[random_y:(random_y+nh), random_x:(random_x + nw)]
@@ -30,14 +31,18 @@ def random_crop(image, masks, coe=0.7):
         mask_height = np.sum(np.any(mask, axis=0), axis=0)
         mask_width = np.sum(np.any(mask, axis=1), axis=0)
         if mask_height < 2 or mask_width < 2:
+            drop_index.append(i)
             continue
         ret_masks.append(mask)
+    
+    # drop out invalid class_ids
+    class_ids = [i for j, i in enumerate(class_ids) if j not in drop_index]
 
     if len(ret_masks) == 0:
-        ret_image, ret_masks = random_crop(image, masks)
+        ret_image, ret_masks, class_ids = random_crop(image, masks, class_ids)
     else:
         ret_masks = np.transpose(np.asarray(ret_masks), (1, 2, 0))
-    return ret_image, ret_masks
+    return ret_image, ret_masks, class_ids
 
 def random_right_angle_rotate(image, masks):
     degree = random.choice(range(4))

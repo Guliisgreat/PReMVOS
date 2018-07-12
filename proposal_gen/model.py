@@ -1137,12 +1137,12 @@ def compute_losses(rpn_match, rpn_bbox, rpn_class_logits, rpn_pred_bbox, target_
 #  Data Generator
 ############################################################
 
-def image_augment(image, mask):
+def image_augment(image, mask, class_ids):
     image, mask = random_flip(image, mask)
-    image, mask = random_crop(image, mask)
+    image, mask, class_ids = random_crop(image, mask, class_ids)
     image, mask = random_right_angle_rotate(image, mask)
     image = random_brightness_transform(image)
-    return image, mask
+    return image, mask, class_ids
 
 
 def load_image_gt(dataset, config, image_id, augment=False,
@@ -1171,7 +1171,7 @@ def load_image_gt(dataset, config, image_id, augment=False,
     mask, class_ids = dataset.load_mask(image_id)
     # Image augmentation
     if augment and random.randint(0, 1):
-        image, mask = image_augment(image, mask)
+        image, mask, class_ids = image_augment(image, mask, class_ids)
     shape = image.shape
     image, window, scale, padding = utils.resize_image(
         image,
