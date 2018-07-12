@@ -566,7 +566,7 @@ def detection_target_layer(proposals, gt_class_ids, gt_boxes, gt_masks, config):
     # Handle COCO crowds
     # A crowd box in COCO is a bounding box around several instances. Exclude
     # them from training. A crowd box is given a negative class ID.
-    if torch.nonzero(gt_class_ids < 0).size():
+    if torch.nonzero(gt_class_ids < 0).size() != [0]:
         crowd_ix = torch.nonzero(gt_class_ids < 0)[:, 0]
         non_crowd_ix = torch.nonzero(gt_class_ids > 0)[:, 0]
         crowd_boxes = gt_boxes[crowd_ix.data, :]
@@ -595,7 +595,7 @@ def detection_target_layer(proposals, gt_class_ids, gt_boxes, gt_masks, config):
 
     # Subsample ROIs. Aim for 33% positive
     # Positive ROIs
-    if torch.nonzero(positive_roi_bool).size():
+    if torch.nonzero(positive_roi_bool).size() != [0]:
         positive_indices = torch.nonzero(positive_roi_bool)[:, 0]
 
         positive_count = int(config.TRAIN_ROIS_PER_IMAGE *
@@ -654,7 +654,7 @@ def detection_target_layer(proposals, gt_class_ids, gt_boxes, gt_masks, config):
     negative_roi_bool = roi_iou_max < 0.5
     negative_roi_bool = negative_roi_bool & no_crowd_bool
     # Negative ROIs. Add enough to maintain positive:negative ratio.
-    if torch.nonzero(negative_roi_bool).size() and positive_count>0:
+    if torch.nonzero(negative_roi_bool).size() != [0] and positive_count>0:
         negative_indices = torch.nonzero(negative_roi_bool)[:, 0]
         r = 1.0 / config.ROI_POSITIVE_RATIO
         negative_count = int(r * positive_count - positive_count)
