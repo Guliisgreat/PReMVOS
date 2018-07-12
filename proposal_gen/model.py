@@ -1483,7 +1483,7 @@ class MaskRCNN(nn.Module):
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                nn.init.xavier_uniform(m.weight)
+                nn.init.xavier_uniform_(m.weight)
                 if m.bias is not None:
                     m.bias.data.zero_()
             elif isinstance(m, nn.BatchNorm2d):
@@ -1883,17 +1883,17 @@ class MaskRCNN(nn.Module):
             # Progress
             printProgressBar(step + 1, steps, prefix="\t{}/{}".format(step + 1, steps),
                              suffix="Complete - loss: {:.5f} - rpn_class_loss: {:.5f} - rpn_bbox_loss: {:.5f} - mrcnn_class_loss: {:.5f} - mrcnn_bbox_loss: {:.5f} - mrcnn_mask_loss: {:.5f}".format(
-                                 loss.item().cpu(), rpn_class_loss.item().cpu(), rpn_bbox_loss.item().cpu(),
-                                 mrcnn_class_loss.item().cpu(), mrcnn_bbox_loss.item().cpu(),
-                                 mrcnn_mask_loss.item().cpu()), length=10)
+                                 loss.item(), rpn_class_loss.item(), rpn_bbox_loss.item(),
+                                 mrcnn_class_loss.item(), mrcnn_bbox_loss.item(),
+                                 mrcnn_mask_loss.item()), length=10)
 
             # Statistics
-            loss_sum += loss.item().cpu()/steps
-            loss_rpn_class_sum += rpn_class_loss.item().cpu()/steps
-            loss_rpn_bbox_sum += rpn_bbox_loss.item().cpu()/steps
-            loss_mrcnn_class_sum += mrcnn_class_loss.item().cpu()/steps
-            loss_mrcnn_bbox_sum += mrcnn_bbox_loss.item().cpu()/steps
-            loss_mrcnn_mask_sum += mrcnn_mask_loss.item().cpu()/steps
+            loss_sum += loss.item()/steps
+            loss_rpn_class_sum += rpn_class_loss.item()/steps
+            loss_rpn_bbox_sum += rpn_bbox_loss.item()/steps
+            loss_mrcnn_class_sum += mrcnn_class_loss.item()/steps
+            loss_mrcnn_bbox_sum += mrcnn_bbox_loss.item()/steps
+            loss_mrcnn_mask_sum += mrcnn_mask_loss.item()/steps
 
             # Break after 'steps' steps
             if step==steps-1:
