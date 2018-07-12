@@ -27,6 +27,9 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
     python3 coco.py evaluate --dataset=/path/to/coco/ --model=last
 """
 
+import warnings
+warnings.filterwarnings('ignore', '.*output shape of zoom.*')
+
 import os
 import time
 import numpy as np
