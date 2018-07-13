@@ -16,8 +16,8 @@ from torch.nn.functional import upsample
 import torch.nn.functional as F
 
 # Custom includes
-from networks import deeplab_xception
-from dataloaders import custom_transforms as tr
+from refinement.networks import deeplab_xception
+from refinement.dataloaders import custom_transforms as tr
 
 import matplotlib
 import matplotlib.pyplot as plt

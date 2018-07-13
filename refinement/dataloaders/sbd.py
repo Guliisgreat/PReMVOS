@@ -6,7 +6,7 @@ import numpy as np
 import scipy.io
 import torch.utils.data as data
 from PIL import Image
-from mypath import Path
+from ..mypath import Path
 
 
 class SBDSegmentation(data.Dataset):

@@ -17,10 +17,10 @@ from torch.nn.functional import upsample
 from tensorboardX import SummaryWriter
 
 # Custom includes
-from dataloaders import pascal, sbd, combine_dbs
-from dataloaders import utils
-from networks import deeplab_xception
-from dataloaders import custom_transforms as tr
+from refinement.dataloaders import pascal, sbd, combine_dbs
+from refinement.dataloaders import utils
+from refinement.networks import deeplab_xception
+from refinement.dataloaders import custom_transforms as tr
 
 
 gpu_id = 0
@@ -51,7 +51,7 @@ if resume_epoch != 0:
 else:
     run_id = 0
 
-save_dir = os.path.join(save_dir_root, 'run', 'run_' + str(run_id))
+save_dir = os.path.join(save_dir_root, 'logs', 'refinement', run_' + str(run_id))
 
 # Network definition
 net = deeplab_xception.DeepLabv3_plus(nInputChannels=3, n_classes=21, pretrained=True)

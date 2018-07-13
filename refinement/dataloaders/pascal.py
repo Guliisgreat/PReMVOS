@@ -3,7 +3,7 @@ import os
 from PIL import Image
 import numpy as np
 from torch.utils.data import Dataset
-from mypath import Path
+from ..mypath import Path
 
 class VOCSegmentation(Dataset):
     """

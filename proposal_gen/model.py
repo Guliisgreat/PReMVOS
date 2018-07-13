@@ -1949,7 +1949,7 @@ class MaskRCNN(nn.Module):
             rpn_class_logits, rpn_pred_bbox, target_class_ids, mrcnn_class_logits, target_deltas, mrcnn_bbox, target_mask, mrcnn_mask = \
                 self.predict([images, image_metas, gt_class_ids, gt_boxes, gt_masks], mode='training')
 
-            if not target_class_ids.size():
+            if not target_class_ids.size() and target_class_ids.size()==torch.Size([0]):
                 continue
 
             # Compute losses

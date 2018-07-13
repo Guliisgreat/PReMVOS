@@ -2,7 +2,7 @@ import torch, cv2
 
 import numpy.random as random
 import numpy as np
-from dataloaders import utils
+from . import utils
 import math
 
 class FixedResize(object):
