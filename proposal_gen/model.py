@@ -566,7 +566,7 @@ def detection_target_layer(proposals, gt_class_ids, gt_boxes, gt_masks, config):
     # Handle COCO crowds
     # A crowd box in COCO is a bounding box around several instances. Exclude
     # them from training. A crowd box is given a negative class ID.
-    if torch.nonzero(gt_class_ids < 0).size() != torch.Size([0]):
+    if torch.nonzero(gt_class_ids < 0).size() and torch.nonzero(gt_class_ids < 0).size() != torch.Size([0]):
         crowd_ix = torch.nonzero(gt_class_ids < 0)[:, 0]
         non_crowd_ix = torch.nonzero(gt_class_ids > 0)[:, 0]
         crowd_boxes = gt_boxes[crowd_ix.data, :]
@@ -595,7 +595,7 @@ def detection_target_layer(proposals, gt_class_ids, gt_boxes, gt_masks, config):
 
     # Subsample ROIs. Aim for 33% positive
     # Positive ROIs
-    if torch.nonzero(positive_roi_bool).size() != torch.Size([0]):
+    if torch.nonzero(positive_roi_bool).size() and torch.nonzero(positive_roi_bool).size() != torch.Size([0]):
         positive_indices = torch.nonzero(positive_roi_bool)[:, 0]
 
         positive_count = int(config.TRAIN_ROIS_PER_IMAGE *
@@ -1054,7 +1054,7 @@ def compute_mrcnn_class_loss(target_class_ids, pred_class_logits):
     """
 
     # Loss
-    if target_class_ids.size():
+    if target_class_ids.size() != torch.Size([0]):
         loss = F.cross_entropy(pred_class_logits,target_class_ids.long())
     else:
         loss = Variable(torch.FloatTensor([0]), requires_grad=False)
@@ -1072,7 +1072,7 @@ def compute_mrcnn_bbox_loss(target_bbox, target_class_ids, pred_bbox):
     pred_bbox: [batch, num_rois, num_classes, (dy, dx, log(dh), log(dw))]
     """
 
-    if target_class_ids.size():
+    if target_class_ids.size() != torch.Size([0]):
         # Only positive ROIs contribute to the loss. And only
         # the right class_id of each ROI. Get their indicies.
         positive_roi_ix = torch.nonzero(target_class_ids > 0)[:, 0]
@@ -1102,7 +1102,7 @@ def compute_mrcnn_mask_loss(target_masks, target_class_ids, pred_masks):
     pred_masks: [batch, proposals, height, width, num_classes] float32 tensor
                 with values from 0 to 1.
     """
-    if target_class_ids.size():
+    if target_class_ids.size() != torch.Size([0]):
         # Only positive ROIs contribute to the loss. And only
         # the class specific mask of each ROI.
         positive_ix = torch.nonzero(target_class_ids > 0)[:, 0]
@@ -1730,7 +1730,7 @@ class MaskRCNN(nn.Module):
             # padded. Equally, returned rois and targets are zero padded.
             rois, target_class_ids, target_deltas, target_mask = \
                 detection_target_layer(rpn_rois, gt_class_ids, gt_boxes, gt_masks, self.config)
-            print(rois.size())
+
             if not rois.size():
                 mrcnn_class_logits = Variable(torch.FloatTensor())
                 mrcnn_class = Variable(torch.IntTensor())
@@ -1949,7 +1949,7 @@ class MaskRCNN(nn.Module):
             rpn_class_logits, rpn_pred_bbox, target_class_ids, mrcnn_class_logits, target_deltas, mrcnn_bbox, target_mask, mrcnn_mask = \
                 self.predict([images, image_metas, gt_class_ids, gt_boxes, gt_masks], mode='training')
 
-            if not target_class_ids.size() and target_class_ids.size()==torch.Size([0]):
+            if not target_class_ids.size() or target_class_ids.size()==torch.Size([0]):
                 continue
 
             # Compute losses
