@@ -36,7 +36,7 @@ def random_crop(image, masks, class_ids, coe=0.7):
         ret_masks.append(mask)
     
     # drop out invalid class_ids
-    class_ids = [i for j, i in enumerate(class_ids) if j not in drop_index]
+    class_ids = np.array([i for j, i in enumerate(class_ids) if j not in drop_index])
 
     if len(ret_masks) == 0:
         ret_image, ret_masks, class_ids = random_crop(image, masks, class_ids)

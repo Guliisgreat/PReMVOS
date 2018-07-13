@@ -1170,8 +1170,8 @@ def load_image_gt(dataset, config, image_id, augment=False,
     image = dataset.load_image(image_id)
     mask, class_ids = dataset.load_mask(image_id)
     # Image augmentation
-    if augment and random.randint(0, 1):
-        image, mask, class_ids = image_augment(image, mask, class_ids)
+    #if augment and random.randint(0, 1):
+    #    image, mask, class_ids = image_augment(image, mask, class_ids)
     shape = image.shape
     image, window, scale, padding = utils.resize_image(
         image,
@@ -1181,10 +1181,10 @@ def load_image_gt(dataset, config, image_id, augment=False,
     mask = utils.resize_mask(mask, scale, padding)
 
     # Random horizontal flips.
-    #if augment:
-    #    if random.randint(0, 1):
-    #        image = np.fliplr(image)
-    #        mask = np.fliplr(mask)
+    if augment:
+        if random.randint(0, 1):
+            image = np.fliplr(image)
+            mask = np.fliplr(mask)
 
     # Bounding boxes. Note that some boxes might be all zeros
     # if the corresponding mask got cropped out.
@@ -1374,7 +1374,11 @@ class Dataset(torch.utils.data.Dataset):
         # where we train on a subset of classes and the image doesn't
         # have any of the classes we care about.
         if not np.any(gt_class_ids > 0):
+            print('gt_class_ids all less then 0')
+            print(image_index)
             return None
+        if not image.any():
+            print('no such image: '+str(image_indx))
 
         # RPN Targets
         rpn_match, rpn_bbox = build_rpn_targets(image.shape, self.anchors,
@@ -1726,7 +1730,7 @@ class MaskRCNN(nn.Module):
             # padded. Equally, returned rois and targets are zero padded.
             rois, target_class_ids, target_deltas, target_mask = \
                 detection_target_layer(rpn_rois, gt_class_ids, gt_boxes, gt_masks, self.config)
-
+            print(rois.size())
             if not rois.size():
                 mrcnn_class_logits = Variable(torch.FloatTensor())
                 mrcnn_class = Variable(torch.IntTensor())
@@ -1882,7 +1886,7 @@ class MaskRCNN(nn.Module):
 
             # Progress
             printProgressBar(step + 1, steps, prefix="\t{}/{}".format(step + 1, steps),
-                             suffix="Complete - loss: {:.5f} - rpn_class_loss: {:.5f} - rpn_bbox_loss: {:.5f} - mrcnn_class_loss: {:.5f} - mrcnn_bbox_loss: {:.5f} - mrcnn_mask_loss: {:.5f}".format(
+                             suffix="loss: {:.5f} - rpn_class_loss: {:.5f} - rpn_bbox_loss: {:.5f} - mrcnn_class_loss: {:.5f} - mrcnn_bbox_loss: {:.5f} - mrcnn_mask_loss: {:.5f}".format(
                                  loss.item(), rpn_class_loss.item(), rpn_bbox_loss.item(),
                                  mrcnn_class_loss.item(), mrcnn_bbox_loss.item(),
                                  mrcnn_mask_loss.item()), length=10)
