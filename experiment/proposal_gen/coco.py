@@ -82,7 +82,7 @@ class CocoConfig(Config):
     IMAGES_PER_GPU = 16
 
     # Uncomment to train on 8 GPUs (default is 1)
-    GPU_COUNT = 6
+    # GPU_COUNT = 6
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 80  # COCO has 80 classes
