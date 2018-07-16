@@ -1,4 +1,5 @@
 import os
+import numpy as np
 
 import torch, cv2
 import random
@@ -46,3 +47,51 @@ def cross_entropy2d(logit, target, ignore_index=255, weight=None, size_average=T
 
 def lr_poly(base_lr, iter_, max_iter=100, power=0.9):
     return base_lr * ((1 - float(iter_) / max_iter) ** power)
+
+def add_size(bbox, imgsize, add_pix=50):
+    '''
+    bbox: (x1, y1, x2, y2)
+    imgsize: [h,w,c]
+    '''
+    h,w = imgsize[:2]
+    # extend bbox with ad_pix
+    bbox_new = [bbox[0]-add_pix, bbox[1]-add_pix, bbox[2]+add_pix, bbox[3]+add_pix]
+    # check size whether cross the border
+    bbox_new = [max(0, bbox_new[0]), max(0, bbox_new[1]), min(w-1, bbox_new[2]), min(h-1, bbox_new[3])]
+    return bbox_new
+
+#--------------------------------------------------------------------------------
+#-- function: jitter bbox
+def jitterBox(bbox, bboxSize, jit_scale = 0.05):
+    """
+    bbox: (x1, y1, x2, y2)
+    jitter random 5%
+    """
+    x1, y1, x2, y2 = bbox
+    w = x2 - x1
+    h = y2 - y1
+    wj = int(w * jit_scale)
+    hj = int(h * jit_scale)
+    return [max(0, x1+int(random.uniform(-wj, wj))),
+            max(0, y1+int(random.uniform(-hj, hj))),
+            min(bboxSize[1]-1, x2+int(random.uniform(-wj, wj))),
+            min(bboxSize[0]-1, y2+int(random.uniform(-hj, hj)))]
+
+def get_distance_map(img, bbox):
+    """
+    img: croped image, PIL image  (h,w,3)
+    bbox: (x1,y1,x2,y2) bbox from annotation
+
+    return:
+        distance_map: numpy array of (h,w) with distance map in 
+            ECCV paper "Deep GrabCut for Object Selection"
+    """
+    img_arr = np.asarray(img)
+    distance_map = np.zeros(img_arr.shape[:2])
+    for i in range(img_arr.shape[0]):
+        for j in range(img_arr.shape[1]):
+            if i<=bbox[3] and i>=bbox[1] and j<=bbox[2] and i>=bbox[0]:
+                distance_map[i][j] = 128 + min( abs(i-bbox[3]), abs(i-bbox[1]), abs(j-bbox[0]), abs(j-bbox[2]) )
+            else:
+                distance_map[i][j] = 128 - min( abs(i-bbox[3]), abs(i-bbox[1]), abs(j-bbox[0]), abs(j-bbox[2]) )
+    return distance_map
